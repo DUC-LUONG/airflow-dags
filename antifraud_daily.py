@@ -12,6 +12,10 @@ antifrauds_dir = Variable.get('antifrauds_dir')
 mock_apps_path = path.join(antifrauds_dir, 'RP_573_Get_Mock_App')
 app_detail_path = path.join(antifrauds_dir, 'AF_688_App_Detail')
 
+seven_days_ago = datetime.combine(
+    datetime.today() - timedelta(7), datetime.min.time()
+)
+
 default_args = {
         'retries': 1,
         'owner': 'max',
