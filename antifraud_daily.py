@@ -40,7 +40,7 @@ get_mock_apps = BashOperator(
     task_id='get_mock_apps',
     bash_command=f"python "
                  f"{path.join(mock_apps_path, 'get_mock_apps_2_0_0.py')} "
-                 f"-e prod"
+                 f"-e prod "
                  f"-c {path.join(mock_apps_path, 'get_mock_apps.ini')} "
 )
 
@@ -49,7 +49,7 @@ get_app_detail = BashOperator(
     task_id='get_app_detail',
     bash_command=f"python "
                  f"{path.join(app_detail_path, 'get_apps_info_1_1_0.py')} "
-                 f"-e production"
+                 f"-e production "
                  f"-c {path.join(app_detail_path, 'get_apps_info.ini')}"
 )
 
