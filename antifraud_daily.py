@@ -5,6 +5,10 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.operators import BashOperator, PythonOperator
 
+# Get environment variable
+antifrauds_dir = Variable.get('antifrauds_dir')
+
+# Get abs path
 mock_apps_path = path.join(antifrauds_dir, 'RP_573_Get_Mock_App')
 app_detail_path = path.join(antifrauds_dir, 'AF_688_App_Detail')
 
