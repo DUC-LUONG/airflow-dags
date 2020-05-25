@@ -16,7 +16,7 @@ print(report_dir)
 
 default_args = {
         'retries': 1,
-        'owner': 'airflow',
+        'owner': 'max',
         'email_on_retry': False,
         'email_on_failure': False,
         'depends_on_past': False,
