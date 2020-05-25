@@ -53,5 +53,5 @@ get_app_detail = BashOperator(
                  f"-c {path.join(app_detail_path, 'get_apps_info.ini')}"
 )
 
-
-
+# Work flow
+get_mock_apps >> get_app_detail
