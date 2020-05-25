@@ -25,7 +25,7 @@ default_args = {
         'retry_delay': timedelta(minutes=5)
 }
 
-dag = DAG('duc_test', default_args=default_args)
+dag = DAG('indoor_sar_worker', default_args=default_args)
 
 
 def test_db(*args, **kwargs):
@@ -46,7 +46,7 @@ run_remote = BashOperator(
    dag=dag)
 
 run_this = PythonOperator(
-      task_id='print_test_db',
+      task_id='test_db',
       provide_context=True,
       python_callable=test_db,
       dag=dag)
