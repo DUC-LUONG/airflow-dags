@@ -42,7 +42,7 @@ default_args = {
 
 
 dag = DAG(
-    'antifraud_dailt',
+    'antifraud_daily',
     default_args=default_args,
     schedule_interval='15 08 * * *'
 )
@@ -62,4 +62,4 @@ get_app_detail = BashOperator(
 )
 
 # Work flow
-get_mock_apps << [get_app_detail, t1]
+get_mock_apps >> get_app_detail
