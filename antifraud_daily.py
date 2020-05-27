@@ -9,8 +9,21 @@ from airflow.operators import BashOperator, PythonOperator
 antifrauds_dir = Variable.get('antifrauds_dir')
 
 # Get abs path
-mock_apps_path = path.join(antifrauds_dir, 'RP_573_Get_Mock_App')
-app_detail_path = path.join(antifrauds_dir, 'AF_688_App_Detail')
+mock_apps_script = path.join(
+    antifrauds_dir, 'RP_573_Get_Mock_App', 'get_mock_apps_2_0_0.py'
+)
+
+mock_apps_ini = path.join(
+    antifrauds_dir, 'RP_573_Get_Mock_App', 'get_mock_apps.ini'
+)
+
+app_detail_script = path.join(
+    antifrauds_dir, 'AF_688_App_Detail', 'get_apps_info_1_1_0.py'
+)
+
+app_detail_ini = path.join(
+    antifrauds_dir, 'AF_688_App_Detail', 'get_apps_info.ini'
+)
 
 seven_days_ago = datetime.combine(
     datetime.today() - timedelta(7), datetime.min.time()
@@ -38,18 +51,15 @@ dag = DAG(
 get_mock_apps = BashOperator(
     dag=dag,
     task_id='get_mock_apps',
-    bash_command=f"python "
-                 f"{path.join(mock_apps_path, 'get_mock_apps_2_0_0.py')} "
-                 f"-e prod "
+    bash_command=f"python {mock_apps_script} -e prod -c {mock_apps_ini}"
 )
 
 get_app_detail = BashOperator(
     dag=dag,
     task_id='get_app_detail',
-    bash_command=f"python "
-                 f"{path.join(app_detail_path, 'get_apps_info_1_1_0.py')} "
-                 f"-e production"
+    bash_command=f"python {app_detail_script} -m production "
+                 f"-c {app_detail_ini}"
 )
 
 # Work flow
-get_mock_apps >> get_app_detail
+get_mock_apps << [get_app_detail, t1]
