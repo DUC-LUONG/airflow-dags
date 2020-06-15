@@ -1,6 +1,8 @@
 # Standard Library
 from os import path
+from pprint import pprint
 from datetime import datetime, timedelta
+
 
 # Airflow library
 from airflow import DAG
@@ -68,70 +70,72 @@ add_master_gdocs = path.join(base_dir, 'gdocs', 'create_indoor_gdocs.py')
 
 create_detail_gdocs = path.join(base_dir, 'gdocs', 'create_indoor_history.py')
 
-from pprint import pprint
 
 def main(**kwargs):
-    print('xxx')
-    a = kwargs
-    print(a)
-    # print(dir(a['config']))
-    print(a['dag_run'].conf)
-    print(dir(a['conf']))
-    return
+
+    conf = kwargs['dag_run'].conf
+
+    _from_date = conf.get('from_date')
+    _to_date = conf.get('to_date')
+
+    # Prioritize get from date and to date from agrument
+    if not _from_date or not _to_date:
+        _from_date, _to_date = make_thursday()
+
+    option_string = f'-f "{_from_date}" -t "{_to_date}"'
+
+    task_instance = kwargs['task_instance']
+    task_instance.xcom_push(key='option', value=option_string)
+
+    return option_string
 #
 # ################ Operator section ################
-# snift = PythonOperator(
-#     dag=dag,
-#     task_id="snift_data",
-#     provide_context=True,
-#     python_callable=main
-# )
 
-main()
 
-test_echo = BashOperator(
+sniff = PythonOperator(
     dag=dag,
-    task_id='test_echo',
-    bash_command='echo "run_id={{ run_id }} | dag_run={{ dag_run.conf.get("message") }} | config {{ conf }}"'
+    task_id="sniff_data",
+    provide_context=True,
+    python_callable=main
 )
 
-# action_sync_data = BashOperator(
-#     dag=dag,
-#     task_id='sync_pi_location',
-#     bash_command=f'python {sync_pi_location} -e prod '
-#                  f'-f "{from_date}" -t "{to_date}"'
-# )
-#
-# action_collect_data = BashOperator(
-#     dag=dag,
-#     task_id='collect_data',
-#     bash_command=f'python {collector} -e prod -m write '
-#                  f'-f "{from_date}" -t "{to_date}"'
-# )
-#
-# action_combine_data = BashOperator(
-#     dag=dag,
-#     task_id='combine_data',
-#     bash_command=f'python {combiner} -e prod -m write '
-#                  f'-f "{from_date}" -t "{to_date}"'
-# )
-#
-# action_add_master_gdocs = BashOperator(
-#     dag=dag,
-#     task_id='add_master_gdocs',
-#     bash_command=f'python {add_master_gdocs} -e prod -g all '
-#                  f'-f "{from_date}" -t "{to_date}"'
-# )
-#
-# action_create_detail_gdocs = BashOperator(
-#     dag=dag,
-#     task_id='create_detail_gdocs',
-#     bash_command=f'python {create_detail_gdocs} -e prod -g all '
-#                  f'-f "{from_date}" -t "{to_date}"'
-# )
+action_sync_data = BashOperator(
+    dag=dag,
+    task_id='sync_pi_location',
+    bash_command=f'python {sync_pi_location} -e prod '
+                 f'{{ task_instance.xcom_pull('
+                 f'task_ids="sniff_data", key="option") }}'
+)
 
+action_collect_data = BashOperator(
+    dag=dag,
+    task_id='collect_data',
+    bash_command=f'python {collector} -e prod -m write '
+                 f'-f "{from_date}" -t "{to_date}"'
+)
+
+action_combine_data = BashOperator(
+    dag=dag,
+    task_id='combine_data',
+    bash_command=f'python {combiner} -e prod -m write '
+                 f'-f "{from_date}" -t "{to_date}"'
+)
+
+action_add_master_gdocs = BashOperator(
+    dag=dag,
+    task_id='add_master_gdocs',
+    bash_command=f'python {add_master_gdocs} -e prod -g all '
+                 f'-f "{from_date}" -t "{to_date}"'
+)
+
+action_create_detail_gdocs = BashOperator(
+    dag=dag,
+    task_id='create_detail_gdocs',
+    bash_command=f'python {create_detail_gdocs} -e prod -g all '
+                 f'-f "{from_date}" -t "{to_date}"'
+)
 
 ################ Control Flow section ################
-[snift, test_echo]
-# action_sync_data >> action_collect_data >> action_combine_data \
-# >> action_add_master_gdocs >> action_create_detail_gdocs
+action_sync_data
+sniff_data >> action_collect_data >> action_combine_data >> action_add_master_gdocs\
+>> action_create_detail_gdocs
