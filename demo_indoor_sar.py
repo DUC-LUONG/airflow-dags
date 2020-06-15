@@ -72,7 +72,10 @@ from pprint import pprint
 
 def main(**kwargs):
     print('xxx')
-    pprint(kwargs)
+    a = (kwargs)
+
+    print(dir(a.config))
+    print(dir(a.dag_run))
     return
 
 ################ Operator section ################
@@ -81,6 +84,12 @@ snift = PythonOperator(
     task_id="snift_data",
     provide_context=True,
     python_callable=main
+)
+
+action_sync_data = BashOperator(
+    dag=dag,
+    task_id='test echo',
+    bash_command='echo "run_id={{ run_id }} | dag_run={{ dag_run }} | config {{ config }}'
 )
 
 # action_sync_data = BashOperator(
