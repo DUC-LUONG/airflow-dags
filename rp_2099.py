@@ -31,8 +31,8 @@ report_dir = Variable.get('prod_reports_dir')
 script_dir = f"{report_dir}/rp_2099_migrate_new_domain"
 
 templated_command = """
-export PYTHONPATH={{ params.gc_report_libs }}
-&& {{ params.py38 }} {{ params.script_dir }}/rp_2099.py 
+export PYTHONPATH={{ params.gc_report_libs }} 
+ && {{ params.py38 }} {{ params.script_dir }}/rp_2099.py 
 {{ params.setting_file }} -e prod 
 """
 
