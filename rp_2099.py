@@ -18,7 +18,7 @@ default_args = {
 }
 
 dag = DAG(
-    title='RP-2099 New domain check',
+    'RP-2099 New domain check',
     schedule_interval='00 8 * * *',
     default_args=default_args,
 )
