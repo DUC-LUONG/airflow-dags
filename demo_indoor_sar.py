@@ -1,10 +1,13 @@
+# Standard Library
 from os import path
 from datetime import datetime, timedelta
 
+# Airflow library
 from airflow import DAG
 from airflow.models import Variable
 from airflow.operators import BashOperator, PythonOperator
 
+# Local library
 from gc_dbc import dbc
 
 seven_days_ago = datetime.combine(
@@ -12,8 +15,10 @@ seven_days_ago = datetime.combine(
 )
 
 report_dir = Variable.get('reports_dir')
-print(report_dir)
+base_dir = path.join(report_dir, 'rp_1373_indoor_sar')
 
+
+################ DAG config section ################
 default_args = {
         'retries': 1,
         'owner': 'max',
@@ -25,31 +30,51 @@ default_args = {
         'retry_delay': timedelta(minutes=5)
 }
 
-dag = DAG('indoor_sar_worker', default_args=default_args)
+dag = DAG('indoor_sar_worker', catchup=True, default_args=default_args)
+
+################ Script section ################
+sync_pi_location = path.join(base_dir, 'indoor_sar_sync.py')
+
+collector = path.join(base_dir, 'indoor_sar_processor.py')
+
+combiner = path.join(base_dir, 'indoor_sar_processor.py')
+
+add_master_gdocs = path.join(base_dir, 'create_indoor_gdocs.py')
+
+create_detail_gdocs = path.join(base_dir, 'create_indoor_history.py')
+
+################ Operator section ################
+action_sync_data = BashOperator(
+    dag=dag,
+    task_id='sync_pi_location',
+    bash_command=f"python {sync_pi_location} -e prod"
+)
+
+action_collect_data = BashOperator(
+    dag=dag,
+    task_id='collect_data',
+    bash_command=f"python {collector} -e prod -m write"
+)
+
+action_combine_data = BashOperator(
+    dag=dag,
+    task_id='combine_data',
+    bash_command=f"python {combiner} -e prod -m write"
+)
+
+action_add_master_gdocs = BashOperator(
+    dag=dag,
+    task_id='add_master_gdocs',
+    bash_command=f"python {add_master_gdocs} -e prod -g all"
+)
+
+action_create_detail_gdocs = BashOperator(
+    dag=dag,
+    task_id='create_detail_gdocs',
+    bash_command=f"python {create_detail_gdocs} -e prod -g all"
+)
 
 
-def test_db(*args, **kwargs):
-
-    with dbc('nv') as session:
-        rows = session.execute("""select 1""")
-        print(rows.fetchall())
-    return
-
-
-script_path = path.join(report_dir, 'rp_1373_indoor_sar/indoor_sar_sync.py')
-# =============================
-
-
-run_remote = BashOperator(
-   task_id='sync_pibeacon_location',
-   bash_command=f"python {script_path} -e test",
-   dag=dag)
-
-run_this = PythonOperator(
-      task_id='test_db',
-      provide_context=True,
-      python_callable=test_db,
-      dag=dag)
-
-# Work flow
-run_this >> run_remote
+################ Control Flow section ################
+action_sync_data >> action_collect_data >> action_combine_data \
+>> action_add_master_gdocs >> action_create_detail_gdocs
