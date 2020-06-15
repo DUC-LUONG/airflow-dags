@@ -1,12 +1,26 @@
 from airflow.models import Variable
+from datetime import timedelta
+
+from airflow import DAG
+from airflow.utils.dates import days_ago
 from airflow.operators import BashOperator
 
-from .gc_dag import GCDAG
 
-dag = GCDAG(
-    'RP-2099 New domain check',
+default_args = {
+        'owner': 'hung',
+        'depends_on_past': False,
+        'start_date': days_ago(2),
+        'email': ['tien.hung@geoguard.com'],
+        'email_on_failure': True,
+        'email_on_retry': True,
+        'retries': 1,
+        'retry_delay': timedelta(minutes=5),
+}
+
+dag = DAG(
+    title='RP-2099 New domain check',
     schedule_interval='00 8 * * *',
-    email=["tien.hung@geoguard.com"]
+    default_args=default_args,
 )
 
 # Base variable

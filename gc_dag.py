@@ -22,13 +22,14 @@ class GCDAG(DAG):
 
     @staticmethod
     def get_default_args(
+            owner='reporter',
             email=['airflow@example.com'],
             notify_failue=True,
             notify_success=True,
             notify_retry=True
     ):
         default_args = {
-            'owner': 'reporter',
+            'owner': owner,
             'depends_on_past': False,
             'start_date': days_ago(2),
             'email': email,
@@ -60,6 +61,7 @@ class GCDAG(DAG):
             self,
             title: str,
             description: str = '',
+            owner='reporter',
             email=['airflow@example.com'],
             schedule_interval: Optional[
                 Union[str, timedelta, relativedelta]
