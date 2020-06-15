@@ -76,6 +76,7 @@ def main(**kwargs):
     print(a)
     # print(dir(a['config']))
     print(dir(a['dag_run']))
+    print(a['conf'])
     return
 
 ################ Operator section ################
