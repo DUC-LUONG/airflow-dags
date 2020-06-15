@@ -86,7 +86,7 @@ snift = PythonOperator(
     python_callable=main
 )
 
-action_sync_data = BashOperator(
+test_echo = BashOperator(
     dag=dag,
     task_id='test echo',
     bash_command='echo "run_id={{ run_id }} | dag_run={{ dag_run }} | config {{ config }}'
@@ -129,6 +129,6 @@ action_sync_data = BashOperator(
 
 
 ################ Control Flow section ################
-snift
+[snift, test_echo]
 # action_sync_data >> action_collect_data >> action_combine_data \
 # >> action_add_master_gdocs >> action_create_detail_gdocs
