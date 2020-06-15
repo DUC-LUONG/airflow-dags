@@ -39,13 +39,13 @@ def make_thursday() -> tuple:
 
     return last_thursday, this_thursday
 
-def make_path(path: list, option: str):
+def make_path(file: list, option: str):
     global base_dir
     _path = base_dir
-    for i in path:
+    for i in file:
         _path = path.join(_path, i)
 
-    return f'python {path} {option}'
+    return f'python {_path} {option}'
 
 
 report_dir = Variable.get('reports_dir')
