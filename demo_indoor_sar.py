@@ -83,9 +83,6 @@ def main(**kwargs):
 
     option_string = f'-f "{_from_date}" -t "{_to_date}"'
 
-    task_instance = kwargs['task_instance']
-    task_instance.xcom_push(key='option', value=option_string)
-
     return option_string
 #
 # ################ Operator section ################
@@ -102,16 +99,15 @@ action_sync_data = BashOperator(
     dag=dag,
     task_id='sync_pi_location',
     bash_command=f'python {sync_pi_location} -e prod '
-                 f'{{ task_instance.xcom_pull('
-                 f'task_ids="sniff_data", key="option") }}'
+                 f'"{{ task_instance.xcom_pull('
+                 f'task_ids="sniff_data", key="option") }}"'
 )
 
 action_collect_data = BashOperator(
     dag=dag,
     task_id='collect_data',
     bash_command='python {} -e prod -m write '
-                 '{{ task_instance.xcom_pull('
-                 'task_ids="sniff_data", key="option") }}'.format(collector)
+                 '"{{ ti.xcom_pull(task_ids="sniff_data") }}"'.format(collector)
 )
 
 action_combine_data = BashOperator(
