@@ -68,16 +68,19 @@ add_master_gdocs = path.join(base_dir, 'gdocs', 'create_indoor_gdocs.py')
 
 create_detail_gdocs = path.join(base_dir, 'gdocs', 'create_indoor_history.py')
 
+from pprint import pprint
 
-def main():
+def main(das, **kwargs):
     print('xxx')
-    print(dag_run.conf)
+    pprint(kwargs)
+    print(ds)
     return
 
 ################ Operator section ################
 snift = PythonOperator(
     dag=dag,
     task_id="snift_data",
+    provide_context=True,
     python_callable=main
 )
 
