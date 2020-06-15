@@ -84,40 +84,40 @@ snift = PythonOperator(
     python_callable=main
 )
 
-action_sync_data = BashOperator(
-    dag=dag,
-    task_id='sync_pi_location',
-    bash_command=f'python {sync_pi_location} -e prod '
-                 f'-f "{from_date}" -t "{to_date}"'
-)
-
-action_collect_data = BashOperator(
-    dag=dag,
-    task_id='collect_data',
-    bash_command=f'python {collector} -e prod -m write '
-                 f'-f "{from_date}" -t "{to_date}"'
-)
-
-action_combine_data = BashOperator(
-    dag=dag,
-    task_id='combine_data',
-    bash_command=f'python {combiner} -e prod -m write '
-                 f'-f "{from_date}" -t "{to_date}"'
-)
-
-action_add_master_gdocs = BashOperator(
-    dag=dag,
-    task_id='add_master_gdocs',
-    bash_command=f'python {add_master_gdocs} -e prod -g all '
-                 f'-f "{from_date}" -t "{to_date}"'
-)
-
-action_create_detail_gdocs = BashOperator(
-    dag=dag,
-    task_id='create_detail_gdocs',
-    bash_command=f'python {create_detail_gdocs} -e prod -g all '
-                 f'-f "{from_date}" -t "{to_date}"'
-)
+# action_sync_data = BashOperator(
+#     dag=dag,
+#     task_id='sync_pi_location',
+#     bash_command=f'python {sync_pi_location} -e prod '
+#                  f'-f "{from_date}" -t "{to_date}"'
+# )
+#
+# action_collect_data = BashOperator(
+#     dag=dag,
+#     task_id='collect_data',
+#     bash_command=f'python {collector} -e prod -m write '
+#                  f'-f "{from_date}" -t "{to_date}"'
+# )
+# 
+# action_combine_data = BashOperator(
+#     dag=dag,
+#     task_id='combine_data',
+#     bash_command=f'python {combiner} -e prod -m write '
+#                  f'-f "{from_date}" -t "{to_date}"'
+# )
+#
+# action_add_master_gdocs = BashOperator(
+#     dag=dag,
+#     task_id='add_master_gdocs',
+#     bash_command=f'python {add_master_gdocs} -e prod -g all '
+#                  f'-f "{from_date}" -t "{to_date}"'
+# )
+#
+# action_create_detail_gdocs = BashOperator(
+#     dag=dag,
+#     task_id='create_detail_gdocs',
+#     bash_command=f'python {create_detail_gdocs} -e prod -g all '
+#                  f'-f "{from_date}" -t "{to_date}"'
+# )
 
 
 ################ Control Flow section ################
