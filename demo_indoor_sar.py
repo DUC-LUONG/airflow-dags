@@ -58,7 +58,6 @@ default_args = {
 dag = DAG('indoor_sar_worker', catchup=True, default_args=default_args)
 
 ################ Script section ################
-from_date, to_date = make_thursday()
 
 sync_pi_location = path.join(base_dir, 'indoor_sar_sync.py')
 
@@ -111,7 +110,8 @@ action_collect_data = BashOperator(
     dag=dag,
     task_id='collect_data',
     bash_command=f'python {collector} -e prod -m write '
-                 f'-f "{from_date}" -t "{to_date}"'
+                 f'{{ task_instance.xcom_pull('
+                 f'task_ids="sniff_data", key="option") }}'
 )
 
 action_combine_data = BashOperator(
