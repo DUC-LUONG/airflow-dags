@@ -64,9 +64,9 @@ collector = path.join(base_dir, 'indoor_sar_processor.py')
 
 combiner = path.join(base_dir, 'indoor_sar_processor.py')
 
-add_master_gdocs = path.join(base_dir, 'create_indoor_gdocs.py')
+add_master_gdocs = path.join(base_dir, 'gdocs', 'create_indoor_gdocs.py')
 
-create_detail_gdocs = path.join(base_dir, 'create_indoor_history.py')
+create_detail_gdocs = path.join(base_dir, 'gdocs', 'create_indoor_history.py')
 
 ################ Operator section ################
 action_sync_data = BashOperator(
