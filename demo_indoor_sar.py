@@ -78,14 +78,16 @@ def main(**kwargs):
     print(a['dag_run'].conf)
     print(dir(a['conf']))
     return
+#
+# ################ Operator section ################
+# snift = PythonOperator(
+#     dag=dag,
+#     task_id="snift_data",
+#     provide_context=True,
+#     python_callable=main
+# )
 
-################ Operator section ################
-snift = PythonOperator(
-    dag=dag,
-    task_id="snift_data",
-    provide_context=True,
-    python_callable=main
-)
+main()
 
 test_echo = BashOperator(
     dag=dag,
