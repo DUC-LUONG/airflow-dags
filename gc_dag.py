@@ -7,7 +7,7 @@ from airflow.utils.dates import days_ago
 
 # Local lib
 from gc_slack import Slacker
-from settings import TEST, PRODUCTION
+from settings import PRODUCTION
 
 
 class GCDAG(DAG):
@@ -15,13 +15,14 @@ class GCDAG(DAG):
     def slack_notificaion(context):
         dag_id = context['task_instance'].dag_id
         status = context['task_instance'].state
-        slacker = Slacker()
+        slacker = Slacker(environment=PRODUCTION)
         slacker.message(
             text="Airflow task *{}* run status: *{}*".format(dag_id, status)
         )
 
     @staticmethod
     def get_default_args(
+            email=['airflow@example.com'],
             notify_failue=True,
             notify_success=True,
             notify_retry=True
@@ -30,7 +31,7 @@ class GCDAG(DAG):
             'owner': 'reporter',
             'depends_on_past': False,
             'start_date': days_ago(2),
-            'email': ['airflow@example.com'],
+            'email': email,
             'email_on_failure': False,
             'email_on_retry': False,
             'retries': 1,
@@ -53,13 +54,13 @@ class GCDAG(DAG):
         if notify_retry:
             default_args['on_retry_callback'] = GCDAG.slack_notificaion
 
+        return default_args
+
     def __init__(
             self,
-            environment: Optional[
-                TEST, PRODUCTION
-            ],
             title: str,
             description: str = '',
+            email=['airflow@example.com'],
             schedule_interval: Optional[
                 Union[str, timedelta, relativedelta]
             ] = timedelta(days=1),
@@ -73,12 +74,11 @@ class GCDAG(DAG):
 
         if not dag_default_args:
             dag_default_args = GCDAG.get_default_args(
+                email,
                 notify_failue,
                 notify_success,
                 notify_retry
             )
-        # Setup env
-        self.environment = environment
 
         super().__init__(
             title,
