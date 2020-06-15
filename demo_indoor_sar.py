@@ -137,5 +137,5 @@ action_create_detail_gdocs = BashOperator(
 
 ################ Control Flow section ################
 action_sync_data
-sniff_data >> action_collect_data >> action_combine_data >> action_add_master_gdocs\
+sniff >> action_collect_data >> action_combine_data >> action_add_master_gdocs\
 >> action_create_detail_gdocs
