@@ -39,6 +39,14 @@ def make_thursday() -> tuple:
 
     return last_thursday, this_thursday
 
+def make_path(path: list, option: str):
+    global base_dir
+    _path = base_dir
+    for i in path:
+        _path = path.join(_path, i)
+
+    return f'python {path} {option}'
+
 
 report_dir = Variable.get('reports_dir')
 base_dir = path.join(report_dir, 'rp_1373_indoor_sar')
@@ -59,21 +67,22 @@ dag = DAG('indoor_sar_worker', catchup=True, default_args=default_args)
 
 ################ Script section ################
 
-sync_pi_location = path.join(base_dir, 'indoor_sar_sync.py')
+sync_pi_location = make_path(['indoor_sar_sync.py'], '-e prod')
 
-collector = path.join(base_dir, 'indoor_sar_processor.py')
+collector = make_path(['indoor_sar_processor.py'], '-e prod -m write')
 
-combiner = path.join(base_dir, 'indoor_sar_processor.py')
+combiner = make_path(['indoor_sar_processor.py'], '-e prod -m write')
 
-add_master_gdocs = path.join(base_dir, 'gdocs', 'create_indoor_gdocs.py')
+add_master_gdocs = make_path(['gdocs', 'create_indoor_gdocs.py'], '-e prod -g all')
 
-create_detail_gdocs = path.join(base_dir, 'gdocs', 'create_indoor_history.py')
+create_detail_gdocs = make_path(['gdocs', 'create_indoor_history.py'], '-e prod -g all')
 
 
 def main(**kwargs):
 
     conf = kwargs['dag_run'].conf
 
+    _from_date = conf.get('from_date')
     _from_date = conf.get('from_date')
     _to_date = conf.get('to_date')
 
@@ -106,7 +115,7 @@ action_sync_data = BashOperator(
 action_collect_data = BashOperator(
     dag=dag,
     task_id='collect_data',
-    bash_command='python create_indoor_history.py -e prod -m write \"{{ task_instance.xcom_pull(task_ids="sniff_data") }}\"'
+    bash_command='python {}.py -e prod -m write {{ task_instance.xcom_pull(task_ids="sniff_data") }}'.format('indoor_sar_processor')
 )
 
 action_combine_data = BashOperator(
