@@ -106,7 +106,7 @@ action_sync_data = BashOperator(
 action_collect_data = BashOperator(
     dag=dag,
     task_id='collect_data',
-    bash_command='python {} -e prod -m write "{{ task_instance.xcom_pull(task_ids="sniff_data") }}"'.format(collector)
+    bash_command='python {} -e prod -m write \"{{ task_instance.xcom_pull(task_ids="sniff_data") }}\"'.format(collector)
 )
 
 action_combine_data = BashOperator(
