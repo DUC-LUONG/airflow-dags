@@ -15,7 +15,7 @@ seven_days_ago = datetime.combine(
 )
 
 
-def make_thursday():
+def make_thursday() -> tuple:
     """Because this dag must run from 2 thursday"""
     current_date = datetime.utcnow()
     week_day = current_date.weekday()
@@ -29,7 +29,11 @@ def make_thursday():
 
     # Get need data
     last_thursday = current_date - timedelta(days=offset)
-    this_thursday = current_date + timedelta(days=7 - offset)
+    this_thursday = current_date + timedelta(days=6 - offset)
+
+    # Format date
+    last_thursday = last_thursday.strftime('%Y-%m-%d 00:00:00')
+    this_thursday = this_thursday.strftime('%Y-%m-%d 23:59:59')
 
     return last_thursday, this_thursday
 
