@@ -88,7 +88,7 @@ snift = PythonOperator(
 
 test_echo = BashOperator(
     dag=dag,
-    task_id='test echo',
+    task_id='test_echo',
     bash_command='echo "run_id={{ run_id }} | dag_run={{ dag_run }} | config {{ config }}'
 )
 
