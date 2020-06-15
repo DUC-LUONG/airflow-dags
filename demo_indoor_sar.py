@@ -86,16 +86,17 @@ dag = DAG('indoor_sar_worker', catchup=True, default_args=default_args)
 
 
 ################ Script section ################
-
 sync_pi_location = make_path(['indoor_sar_sync.py'], '-e prod')
 
 collector = make_path(['indoor_sar_processor.py'], '-e prod -m write')
 
-combiner = make_path(['indoor_sar_processor.py'], '-e prod -m write')
+combiner = make_path(['indoor_sar_combine.py'], '-e prod -m write')
 
-add_master_gdocs = make_path(['gdocs', 'create_indoor_gdocs.py'], '-e prod -g all')
+add_master_gdocs = make_path(['gdocs', 'create_indoor_gdocs.py'],
+                             '-e prod -g all')
 
-create_detail_gdocs = make_path(['gdocs', 'create_indoor_history.py'], '-e prod -g all')
+create_detail_gdocs = make_path(['gdocs', 'create_indoor_history.py'],
+                                '-e prod -g all')
 
 # ################ Operator section ################
 optional = '{{ task_instance.xcom_pull(task_ids="sniff_data") }}'
