@@ -110,7 +110,7 @@ sniff = PythonOperator(
 action_sync_data = BashOperator(
     dag=dag,
     task_id='sync_pi_location',
-    bash_command=f'python {sync_pi_location} -e prod'
+    bash_command=sync_pi_location
 )
 
 action_collect_data = BashOperator(
@@ -122,7 +122,7 @@ action_collect_data = BashOperator(
 action_combine_data = BashOperator(
     dag=dag,
     task_id='combine_data',
-    bash_command=combiner + ' '  + optional
+    bash_command=combiner + ' ' + optional
 )
 
 action_add_master_gdocs = BashOperator(
