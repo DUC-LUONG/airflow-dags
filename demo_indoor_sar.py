@@ -72,10 +72,10 @@ from pprint import pprint
 
 def main(**kwargs):
     print('xxx')
-    a = (kwargs)
+    a = kwargs
 
-    print(dir(a.config))
-    print(dir(a.dag_run))
+    print(dir(a['config']))
+    print(dir(a.['dag_run'])
     return
 
 ################ Operator section ################
