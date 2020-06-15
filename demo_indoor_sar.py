@@ -68,7 +68,19 @@ add_master_gdocs = path.join(base_dir, 'gdocs', 'create_indoor_gdocs.py')
 
 create_detail_gdocs = path.join(base_dir, 'gdocs', 'create_indoor_history.py')
 
+
+def main():
+    print('xxx')
+    print(dag_run.conf)
+    return
+
 ################ Operator section ################
+snift = PythonOperator(
+    dag=dag,
+    task_id="snift_data",
+    python_callable=main
+)
+
 action_sync_data = BashOperator(
     dag=dag,
     task_id='sync_pi_location',
@@ -106,5 +118,6 @@ action_create_detail_gdocs = BashOperator(
 
 
 ################ Control Flow section ################
-action_sync_data >> action_collect_data >> action_combine_data \
->> action_add_master_gdocs >> action_create_detail_gdocs
+snift
+# action_sync_data >> action_collect_data >> action_combine_data \
+# >> action_add_master_gdocs >> action_create_detail_gdocs
