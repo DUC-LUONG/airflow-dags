@@ -75,7 +75,7 @@ def main(**kwargs):
     a = kwargs
     print(a)
     # print(dir(a['config']))
-    print(dir(a['dag_run']))
+    print(a['dag_run'].conf)
     print(dir(a['conf']))
     return
 
@@ -90,7 +90,7 @@ snift = PythonOperator(
 test_echo = BashOperator(
     dag=dag,
     task_id='test_echo',
-    bash_command='echo "run_id={{ run_id }} | dag_run={{ dag_run }} | config {{ conf }}"'
+    bash_command='echo "run_id={{ run_id }} | dag_run={{ dag_run.conf.get("message") }} | config {{ conf }}"'
 )
 
 # action_sync_data = BashOperator(
