@@ -43,7 +43,7 @@ base_dir = path.join(report_dir, 'rp_1373_indoor_sar')
 
 ################ DAG config section ################
 default_args = {
-        'retries': 1,
+        'retries': 0,
         'owner': 'max',
         'email_on_retry': False,
         'email_on_failure': False,
