@@ -14,9 +14,28 @@ seven_days_ago = datetime.combine(
     datetime.today() - timedelta(7), datetime.min.time()
 )
 
+
+def make_thursday():
+    """Because this dag must run from 2 thursday"""
+    current_date = datetime.utcnow()
+    week_day = current_date.weekday()
+
+    # If execute date is not thursday the back to 1 week
+    if week_day < 3:
+        current_date = current_date - timedelta(days=7)
+
+    # Create offset from current date
+    offset = (week_day - 3) % 7
+
+    # Get need data
+    last_thursday = current_date - timedelta(days=offset)
+    this_thursday = current_date + timedelta(days=7 - offset)
+
+    return last_thursday, this_thursday
+
+
 report_dir = Variable.get('reports_dir')
 base_dir = path.join(report_dir, 'rp_1373_indoor_sar')
-
 
 ################ DAG config section ################
 default_args = {
@@ -33,6 +52,8 @@ default_args = {
 dag = DAG('indoor_sar_worker', catchup=True, default_args=default_args)
 
 ################ Script section ################
+from_date, to_date = make_thursday()
+
 sync_pi_location = path.join(base_dir, 'indoor_sar_sync.py')
 
 collector = path.join(base_dir, 'indoor_sar_processor.py')
@@ -47,31 +68,36 @@ create_detail_gdocs = path.join(base_dir, 'create_indoor_history.py')
 action_sync_data = BashOperator(
     dag=dag,
     task_id='sync_pi_location',
-    bash_command=f"python {sync_pi_location} -e prod"
+    bash_command=f'python {sync_pi_location} -e prod '
+                 f'-f "{from_date}" -t "{to_date}"'
 )
 
 action_collect_data = BashOperator(
     dag=dag,
     task_id='collect_data',
-    bash_command=f"python {collector} -e prod -m write"
+    bash_command=f'python {collector} -e prod -m write'
+                 f'-f "{from_date}" -t "{to_date}"'
 )
 
 action_combine_data = BashOperator(
     dag=dag,
     task_id='combine_data',
-    bash_command=f"python {combiner} -e prod -m write"
+    bash_command=f'python {combiner} -e prod -m write'
+                 f'-f "{from_date}" -t "{to_date}"'
 )
 
 action_add_master_gdocs = BashOperator(
     dag=dag,
     task_id='add_master_gdocs',
-    bash_command=f"python {add_master_gdocs} -e prod -g all"
+    bash_command=f'python {add_master_gdocs} -e prod -g all'
+                 f'-f "{from_date}" -t "{to_date}"'
 )
 
 action_create_detail_gdocs = BashOperator(
     dag=dag,
     task_id='create_detail_gdocs',
-    bash_command=f"python {create_detail_gdocs} -e prod -g all"
+    bash_command=f'python {create_detail_gdocs} -e prod -g all '
+                 f'-f "{from_date}" -t "{to_date}"'
 )
 
 
