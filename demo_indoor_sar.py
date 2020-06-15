@@ -70,10 +70,9 @@ create_detail_gdocs = path.join(base_dir, 'gdocs', 'create_indoor_history.py')
 
 from pprint import pprint
 
-def main(das, **kwargs):
+def main(**kwargs):
     print('xxx')
     pprint(kwargs)
-    print(ds)
     return
 
 ################ Operator section ################
@@ -97,7 +96,7 @@ snift = PythonOperator(
 #     bash_command=f'python {collector} -e prod -m write '
 #                  f'-f "{from_date}" -t "{to_date}"'
 # )
-# 
+#
 # action_combine_data = BashOperator(
 #     dag=dag,
 #     task_id='combine_data',
