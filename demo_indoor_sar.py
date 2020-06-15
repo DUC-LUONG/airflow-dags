@@ -52,25 +52,25 @@ action_sync_data = BashOperator(
 
 action_collect_data = BashOperator(
     dag=dag,
-    task_id='sync_pi_location',
+    task_id='collect_data',
     bash_command=f"python {collector} -e prod -m write"
 )
 
 action_combine_data = BashOperator(
     dag=dag,
-    task_id='sync_pi_location',
+    task_id='combine_data',
     bash_command=f"python {combiner} -e prod -m write"
 )
 
 action_add_master_gdocs = BashOperator(
     dag=dag,
-    task_id='sync_pi_location',
+    task_id='add_master_gdocs',
     bash_command=f"python {add_master_gdocs} -e prod -g all"
 )
 
 action_create_detail_gdocs = BashOperator(
     dag=dag,
-    task_id='sync_pi_location',
+    task_id='create_detail_gdocs',
     bash_command=f"python {create_detail_gdocs} -e prod -g all"
 )
 
