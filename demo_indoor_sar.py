@@ -39,6 +39,7 @@ def make_thursday() -> tuple:
 
     return last_thursday, this_thursday
 
+
 def make_path(file: list, option: str):
     global base_dir
     _path = base_dir
@@ -46,36 +47,6 @@ def make_path(file: list, option: str):
         _path = path.join(_path, i)
 
     return f'python {_path} {option}'
-
-
-report_dir = Variable.get('reports_dir')
-base_dir = path.join(report_dir, 'rp_1373_indoor_sar')
-
-################ DAG config section ################
-default_args = {
-        'retries': 0,
-        'owner': 'max',
-        'email_on_retry': False,
-        'email_on_failure': False,
-        'depends_on_past': False,
-        'start_date': seven_days_ago,
-        'email': ['duc@geoguard.com'],
-        'retry_delay': timedelta(minutes=5)
-}
-
-dag = DAG('indoor_sar_worker', catchup=True, default_args=default_args)
-
-################ Script section ################
-
-sync_pi_location = make_path(['indoor_sar_sync.py'], '-e prod')
-
-collector = make_path(['indoor_sar_processor.py'], '-e prod -m write')
-
-combiner = make_path(['indoor_sar_processor.py'], '-e prod -m write')
-
-add_master_gdocs = make_path(['gdocs', 'create_indoor_gdocs.py'], '-e prod -g all')
-
-create_detail_gdocs = make_path(['gdocs', 'create_indoor_history.py'], '-e prod -g all')
 
 
 def main(**kwargs):
@@ -93,9 +64,41 @@ def main(**kwargs):
     option_string = f'-f "{_from_date}" -t "{_to_date}"'
 
     return option_string
-#
-# ################ Operator section ################
 
+
+report_dir = Variable.get('reports_dir')
+base_dir = path.join(report_dir, 'rp_1373_indoor_sar')
+
+
+################ DAG config section ################
+default_args = {
+        'retries': 0,
+        'owner': 'max',
+        'email_on_retry': False,
+        'email_on_failure': False,
+        'depends_on_past': False,
+        'start_date': seven_days_ago,
+        'email': ['duc@geoguard.com'],
+        'retry_delay': timedelta(minutes=5)
+}
+
+dag = DAG('indoor_sar_worker', catchup=True, default_args=default_args)
+
+
+################ Script section ################
+
+sync_pi_location = make_path(['indoor_sar_sync.py'], '-e prod')
+
+collector = make_path(['indoor_sar_processor.py'], '-e prod -m write')
+
+combiner = make_path(['indoor_sar_processor.py'], '-e prod -m write')
+
+add_master_gdocs = make_path(['gdocs', 'create_indoor_gdocs.py'], '-e prod -g all')
+
+create_detail_gdocs = make_path(['gdocs', 'create_indoor_history.py'], '-e prod -g all')
+
+# ################ Operator section ################
+optional = '{{ task_instance.xcom_pull(task_ids="sniff_data") }}'
 
 sniff = PythonOperator(
     dag=dag,
@@ -107,39 +110,31 @@ sniff = PythonOperator(
 action_sync_data = BashOperator(
     dag=dag,
     task_id='sync_pi_location',
-    bash_command=f'python {sync_pi_location} -e prod '
-                 f'"{{ task_instance.xcom_pull('
-                 f'task_ids="sniff_data", key="option") }}"'
+    bash_command=f'python {sync_pi_location} -e prod'
 )
 
 action_collect_data = BashOperator(
     dag=dag,
     task_id='collect_data',
-    bash_command=collector + ' ' + '{{ task_instance.xcom_pull(task_ids="sniff_data") }}'
+    bash_command=collector + ' ' + optional
 )
 
 action_combine_data = BashOperator(
     dag=dag,
     task_id='combine_data',
-    bash_command=f'python {combiner} -e prod -m write '
-                 f'{{ task_instance.xcom_pull('
-                 f'task_ids="sniff_data", key="option") }}'
+    bash_command=combiner + ' '  + optional
 )
 
 action_add_master_gdocs = BashOperator(
     dag=dag,
     task_id='add_master_gdocs',
-    bash_command=f'python {add_master_gdocs} -e prod -g all '
-                 f'{{ task_instance.xcom_pull('
-                 f'task_ids="sniff_data", key="option") }}'
+    bash_command=add_master_gdocs + ' ' + optional
 )
 
 action_create_detail_gdocs = BashOperator(
     dag=dag,
     task_id='create_detail_gdocs',
-    bash_command=f'python {create_detail_gdocs} -e prod -g all '
-                 f'{{ task_instance.xcom_pull('
-                 f'task_ids="sniff_data", key="option") }}'
+    bash_command=create_detail_gdocs + ' ' + optional
 )
 
 ################ Control Flow section ################
