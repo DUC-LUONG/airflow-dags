@@ -60,8 +60,7 @@ rp_1388 = BashOperator(
     ),
     dag=dag)
 rp_1388.doc_md = """\
-# RP_1388 North Carolina Lottery, North Dakota Lottery ('
-'Scientific Games) 
+# RP_1388 North Carolina Lottery, North Dakota Lottery (Scientific Games) 
 """
 
 cs_1285 = BashOperator(
