@@ -32,7 +32,7 @@ script_dir = f"{report_dir}/rp_2099_migrate_new_domain"
 
 templated_command = """
 export PYTHONPATH={{ params.gc_report_libs }} 
-{{ params.py38 }} {{ params.script_dir }}/rp_2099.py --config {{ params.setting_file }} -e prod --draft n --dry-run n
+{{ params.py38 }} {{ params.script_dir }}/rp_2099.py --config {{ params.setting_file }} -e test --draft n --dry-run n
 """
 
 rp_2083 = BashOperator(
