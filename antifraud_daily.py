@@ -59,9 +59,9 @@ get_mock_apps = BashOperator(
     dag=dag,
     xcom_push=True,
     task_id='get_mock_apps',
-    bash_command=f"python {mock_apps_script} -e prod -c {mock_apps_ini} "
-                 f"-f {yesterday.strftime('%Y-%m-%d 00:00:00')} "
-                 f"-t {yesterday.strftime('%Y-%m-%d 23:59:59')}; echo $?"
+    bash_command=f'python {mock_apps_script} -e prod -c {mock_apps_ini} '
+                 f'-f "{yesterday.strftime("%Y-%m-%d 00:00:00")}" '
+                 f'-t "{yesterday.strftime("%Y-%m-%d 23:59:59")}"; echo $?'
 )
 
 app_detail_script = path.join(
@@ -75,10 +75,10 @@ get_app_detail = BashOperator(
     xcom_push=True,
     task_id='get_app_detail',
     trigger_rule=TriggerRule.ONE_SUCCESS,
-    bash_command=f"python {app_detail_script} -m production "
-                 f"-c {app_detail_ini} "
-                 f"-f {current_date.strftime('%Y-%m-%d 00:00:00')} "
-                 f"-t {current_date.strftime('%Y-%m-%d 23:59:59')}; echo $?"
+    bash_command=f'python {app_detail_script} -m production '
+                 f'-c {app_detail_ini} '
+                 f'-f "{current_date.strftime("%Y-%m-%d 00:00:00")}" '
+                 f'-t "{current_date.strftime("%Y-%m-%d 23:59:59")}"; echo $?'
 )
 
 
@@ -124,8 +124,8 @@ detect_change = BashOperator(
     dag=dag,
     xcom_push=True,
     task_id='detect_change',
-    bash_command=f"python {detect_change_script} -c {detect_change_ini} "
-                 f"-f {yesterday.strftime('%Y-%m-%d')} -e prod -r 2; echo $?"
+    bash_command=f'python {detect_change_script} -c {detect_change_ini} '
+                 f'-f "{yesterday.strftime("%Y-%m-%d")}" -e prod -r 2; echo $?'
 )
 
 appclonder_script = path.join(
@@ -140,8 +140,8 @@ app_cloner = BashOperator(
     dag=dag,
     xcom_push=True,
     task_id='app_cloner',
-    bash_command=f"python {appclonder_script} -c {appclonder_ini} "
-                 f"-d {yesterday.strftime('%Y-%m-%d')}; echo $?"
+    bash_command=f'python {appclonder_script} -c {appclonder_ini} '
+                 f'-d "{yesterday.strftime("%Y-%m-%d")}"; echo $?'
 )
 
 
@@ -152,6 +152,7 @@ def conclusion(*args, **kargs):
         err_code = task_instance.xcom_pull(task_ids=task)
         print(err_code)
     return
+
 
 conclusion = PythonOperator(
     dag=dag,
