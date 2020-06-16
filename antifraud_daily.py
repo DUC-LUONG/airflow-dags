@@ -153,7 +153,7 @@ def conclusion(*args, **kargs):
         print(err_code)
     return
 
-check_weekday = PythonOperator(
+conclusion = PythonOperator(
     dag=dag,
     task_id='conclusion',
     provide_context=True,
@@ -162,7 +162,7 @@ check_weekday = PythonOperator(
 )
 
 # Work flow
-app_cloner >> check_weekday
-detect_change >> check_weekday
-get_mock_apps >> get_app_detail >> check_weekday
-check_weekday >> app_to_test >> web_scrapper >> check_weekday
+app_cloner >> conclusion
+detect_change >> conclusion
+get_mock_apps >> get_app_detail >> conclusion
+check_weekday >> app_to_test >> web_scrapper >> conclusion
