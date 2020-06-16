@@ -72,4 +72,4 @@ build_csv_for_wifi_ap.doc_md = """\
 """
 
 # Main flow
-[mobile_ap, wifi_db_error] >> exclude_updated_wifi_db_error >> build_csv_for_wifi_ap
+[mobile_ap, wifi_db_error, exclude_updated_wifi_db_error] >> build_csv_for_wifi_ap
