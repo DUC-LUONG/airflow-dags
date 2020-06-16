@@ -74,7 +74,7 @@ cs_1285 = BashOperator(
         setting_file=f"{script_dir}/cs_1285.ini"
     ),
     dag=dag)
-rp_1388.doc_md = """\
+cs_1285.doc_md = """\
 # CS_1285 NorthCarolina Neogames
 """
 
@@ -88,7 +88,7 @@ rp_966 = BashOperator(
         setting_file=f"{script_dir}/rp_966.ini"
     ),
     dag=dag)
-rp_1388.doc_md = """\
+rp_966.doc_md = """\
 # RP_966 US4 Production
 """
 
@@ -102,7 +102,7 @@ rp_1228 = BashOperator(
         setting_file=f"{script_dir}/rp_1228.ini"
     ),
     dag=dag)
-rp_1388.doc_md = """\
+rp_1228.doc_md = """\
 # RP_1228 NeoPollard
 """
 
