@@ -37,7 +37,7 @@ with DAG('test_alert',
 
     send_mail = EmailOperator(
         task_id="send_mail",
-        to='max@geoguard.com',
+        to='duc@geoguard.com',
         subject='Test mail',
         html_content='<p> You have got mail! <p>')
 
