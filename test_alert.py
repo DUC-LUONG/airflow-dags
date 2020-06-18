@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta
 
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator, EmailOperator,\
-    PythonOperator
+from airflow.operators import DummyOperator, EmailOperator, PythonOperator
 
 
 default_args = {
@@ -12,8 +11,8 @@ default_args = {
     'email_on_retry': True,
     'email': ['duc@geoguard.com'],
     'retries': 1,
-    'retry_delay': timedelta(minutes=5)
-
+    'retry_delay': timedelta(minutes=5),
+    'schedule_interval': '@once'
 }
 
 
@@ -23,7 +22,6 @@ def error_function():
 
 with DAG('test_alert',
          default_args=default_args,
-         schedule_interval='@once',
          catchup=False) as dag:
 
     wont_email = DummyOperator(
