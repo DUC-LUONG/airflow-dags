@@ -44,6 +44,7 @@ wifi_db_error = BashOperator(
     params=dict(
         report_id='rp_1608'
     ),
+    trigger_rule='all_done',
     dag=dag)
 wifi_db_error.doc_md = """\
 # RP-1608: WiFi Access Points database error Report
@@ -56,7 +57,7 @@ exclude_updated_wifi_db_error = BashOperator(
         report_id='rp_2130'
     ),
     dag=dag)
-wifi_db_error.doc_md = """\
+exclude_updated_wifi_db_error.doc_md = """\
 # RP-2130: Auto exclude updated G/S db error wifi APs from the database
 """
 
@@ -72,4 +73,5 @@ build_csv_for_wifi_ap.doc_md = """\
 """
 
 # Main flow
-[mobile_ap, wifi_db_error, exclude_updated_wifi_db_error] >> build_csv_for_wifi_ap
+mobile_ap >> build_csv_for_wifi_ap
+exclude_updated_wifi_db_error >> wifi_db_error >> build_csv_for_wifi_ap
