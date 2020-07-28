@@ -4,7 +4,6 @@ execution:
   ramp-up: 2m
   scenario: Choose Flight
 
-
 scenarios:
   Choose Flight:
     requests:
