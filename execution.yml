@@ -1,0 +1,19 @@
+
+execution:
+- concurrency: 50
+  hold-for: 3m
+  ramp-up: 2m
+  scenario: Choose Flight
+
+scenarios:
+  Choose Flight:
+    requests:
+    - label: blazedemo
+      method: GET
+      url: http://blazedemo.com/
+    - label: reserve
+      url: http://blazedemo/reverse.php
+      method: POST
+      body:
+        fromPort: Paris
+        toPort: Bunos Aires
